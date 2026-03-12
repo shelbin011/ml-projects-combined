@@ -60,14 +60,14 @@ def heart_disease(request):
             float(request.POST.get('cp')),
             float(request.POST.get('trestbps')),
             float(request.POST.get('chol')),
-            0.0,  # fbs (fasting blood sugar): assume normal (0)
-            1.0,  # restecg: assume normal (1)
+            0.15,  # fbs: dataset mean (0.15)
+            0.53,  # restecg: dataset mean (0.53)
             float(request.POST.get('thalach')),
-            0.0,  # exang (exercise angina): assume none (0)
-            1.0,  # oldpeak: assume typical median (1.0)
-            2.0,  # slope: assume typical median (2.0)
-            0.0,  # ca: assume typical healthy (0.0)
-            2.0   # thal: assume typical normal (2.0)
+            0.34,  # exang: dataset mean (0.34)
+            1.07,  # oldpeak: dataset mean (1.07)
+            1.39,  # slope: dataset mean (1.39)
+            0.75,  # ca: dataset mean (0.75)
+            2.32   # thal: dataset mean (2.32)
         ]
         model = load_file('heart_disease_model.pkl')
         if model:
