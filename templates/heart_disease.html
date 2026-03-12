@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Cardiac Diagnostics Engine</h1>
+    <p class="page-subtitle">Refined Logistic Regression pipeline utilizing 6 core biometrics to accurately identify heart condition manifestations.</p>
+</div>
+
+<div class="form-container" style="max-width: 900px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Age <small style="color: #94a3b8;">(29 - 77 years)</small></label>
+                <input type="number" step="0.1" min="29" max="77" name="age" class="form-control" placeholder="e.g. 52" required>
+            </div>
+            <div class="form-group">
+                <label>Sex <small style="color: #94a3b8;">(0: Female, 1: Male)</small></label>
+                <input type="number" step="0.1" min="0" max="1" name="sex" class="form-control" placeholder="e.g. 1" required>
+            </div>
+            <div class="form-group">
+                <label>Chest Pain (cp) <small style="color: #94a3b8;">(0 - 3)</small></label>
+                <input type="number" step="0.1" min="0" max="3" name="cp" class="form-control" placeholder="e.g. 0" required>
+            </div>
+            <div class="form-group">
+                <label>Resting Blood Pressure <small style="color: #94a3b8;">(94 - 200 mm Hg)</small></label>
+                <input type="number" step="0.1" min="94" max="200" name="trestbps" class="form-control" placeholder="e.g. 125" required>
+            </div>
+            <div class="form-group">
+                <label>Serum Cholestoral <small style="color: #94a3b8;">(126 - 564 mg/dl)</small></label>
+                <input type="number" step="0.1" min="126" max="564" name="chol" class="form-control" placeholder="e.g. 212" required>
+            </div>
+            <div class="form-group">
+                <label>Max Heart Rate (thalach) <small style="color: #94a3b8;">(71 - 202 bpm)</small></label>
+                <input type="number" step="0.1" min="71" max="202" name="thalach" class="form-control" placeholder="e.g. 168" required>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; margin-top: 2rem;">Analyze Biometrics</button>
+    </form>
+
+    {% if prediction %}
+    <div class="prediction-result">
+        <div class="result-title">Diagnostic Decision</div>
+        <div class="result-value" style="color: {% if prediction == 'Disease Detected' %}#fb7185{% else %}#34d399{% endif %};">
+            {{ prediction }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

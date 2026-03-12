@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Demographic Growth Forecast</h1>
+    <p class="page-subtitle">Computational polynomial regression extrapolation providing macroeconomic level population predictions.</p>
+</div>
+
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="country">Country</label>
+            <select name="country" id="country" class="form-control" required>
+                <option value="" disabled selected>Select a country</option>
+                {% for c in countries %}
+                <option value="{{ c }}" {% if selected_country == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin-top: 1rem;">
+            <label for="year">Target Year</label>
+            <input type="number" name="year" id="year" class="form-control" placeholder="e.g. 2030" min="1950" max="3000" required>
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">Process Target Timeline</button>
+    </form>
+
+    {% if prediction %}
+    <div class="prediction-result" style="margin-top: 2rem;">
+        <div class="result-title">Projected Population for {{ selected_country }}</div>
+        <div class="result-value" style="color: #60a5fa;">
+            {{ prediction }}{% if "Out of range" not in prediction %} Citizens{% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

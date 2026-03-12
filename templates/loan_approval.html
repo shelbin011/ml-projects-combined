@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Loan Approval System</h1>
+    <p class="page-subtitle">K-Nearest Neighbors model analyzing financial and demographic vectors to underwrite personal risk.</p>
+</div>
+
+<div class="form-container" style="max-width: 900px;">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <h3 style="margin-top: 0; margin-bottom: 1.5rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">Personal Details</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Number of Dependents</label>
+                <input type="number" name="no_of_dependents" class="form-control" min="0" max="10" placeholder="e.g. 2" required>
+            </div>
+            <div class="form-group">
+                <label>Education</label>
+                <select name="education" class="form-control" required>
+                    <option value="" disabled selected>Select Education Level</option>
+                    <option value="0">Graduate</option>
+                    <option value="1">Not Graduate</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Employment Status</label>
+                <select name="self_employed" class="form-control" required>
+                    <option value="" disabled selected>Select Employment</option>
+                    <option value="0">Salaried / Not Self-Employed</option>
+                    <option value="1">Self Employed</option>
+                </select>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 1.5rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">Loan & Income Request</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Annual Income (₹)</label>
+                <input type="number" name="income_annum" class="form-control" min="0" step="1000" placeholder="e.g. 1000000" required>
+            </div>
+            <div class="form-group">
+                <label>Loan Amount (₹)</label>
+                <input type="number" name="loan_amount" class="form-control" min="0" step="1000" placeholder="e.g. 5000000" required>
+            </div>
+            <div class="form-group">
+                <label>Loan Term (Months)</label>
+                <input type="number" name="loan_term" class="form-control" min="1" max="360" placeholder="e.g. 60" required>
+            </div>
+            <div class="form-group">
+                <label>CIBIL Score</label>
+                <input type="number" name="cibil_score" class="form-control" min="300" max="900" placeholder="e.g. 750" required>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 1.5rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem;">Asset Declarations (₹)</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.5rem; margin-top: -1rem;">
+            Please estimate the total value of assets owned in the following categories. Enter 0 if none.
+        </p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Residential Assets</label>
+                <input type="number" name="residential_assets" class="form-control" min="0" step="1000" placeholder="Value of homes, land" required>
+            </div>
+            <div class="form-group">
+                <label>Commercial Assets</label>
+                <input type="number" name="commercial_assets" class="form-control" min="0" step="1000" placeholder="Value of offices, shops" required>
+            </div>
+            <div class="form-group">
+                <label>Luxury Assets</label>
+                <input type="number" name="luxury_assets" class="form-control" min="0" step="1000" placeholder="Value of cars, jewelry" required>
+            </div>
+            <div class="form-group">
+                <label>Bank Assets</label>
+                <input type="number" name="bank_assets" class="form-control" min="0" step="1000" placeholder="Value of savings, FDs" required>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; margin-top: 2rem;">Assess applicant</button>
+    </form>
+
+    {% if prediction %}
+    <div class="prediction-result" style="margin-top: 2rem;">
+        <div class="result-title">Credit Decision</div>
+        <div class="result-value" style="color: {% if prediction == 'Approved' %}#34d399{% else %}#fb7185{% endif %};">
+            {{ prediction }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

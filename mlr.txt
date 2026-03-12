@@ -1,0 +1,76 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_squared_error
+
+from google.colab import files
+uploaded = files.upload()
+
+df = pd.read_csv("auto-mpg.csv")
+df.head()
+
+df.info()
+df.describe()
+df.isnull().sum()
+
+df['horsepower'] = pd.to_numeric(df['horsepower'], errors='coerce')
+
+df['horsepower'].fillna(df['horsepower'].mean(), inplace=True)
+
+df.drop('car name', axis=1, inplace=True)
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10,6))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.show()
+
+X = df.drop('mpg', axis=1)
+y = df['mpg']
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+from sklearn.linear_model import LinearRegression
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+import numpy as np
+
+print("R2 Score:", r2_score(y_test, y_pred))
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("RMSE:", np.sqrt(mean_squared_error(y_test, y_pred)))
+print("MAE:", mean_absolute_error(y_test, y_pred))
+
+coeff_df = pd.DataFrame(model.coef_, X.columns, columns=['Coefficient'])
+print(coeff_df)
+
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual MPG")
+plt.ylabel("Predicted MPG")
+plt.title("Actual vs Predicted MPG")
+plt.show()
+
+# Example new car data
+new_data = [[4, 140, 90, 2264, 15.5, 71, 1]]
+
+predicted_mpg = model.predict(new_data)
+
+print("Predicted MPG:", predicted_mpg[0])
+
+import pickle
+
+with open('mlr_auto_mpg_model.pkl', 'wb') as f:
+    pickle.dump(model, f)

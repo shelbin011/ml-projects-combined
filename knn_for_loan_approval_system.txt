@@ -1,0 +1,90 @@
+import pandas as pd
+import numpy as np
+import pickle
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
+
+from google.colab import files
+uploaded = files.upload()
+
+try:
+    df = pd.read_csv('loan_approval_dataset.csv')
+    print("Dataset loaded successfully!")
+    print(df.head())
+except FileNotFoundError:
+    print("Error: Please upload 'loan_approval_dataset.csv' to the Colab file sidebar.")
+
+# Strip whitespace from column names
+df.columns = df.columns.str.strip()
+
+# Drop the unique identifier 'loan_id'
+df = df.drop('loan_id', axis=1)
+
+print("Cleaned Columns:", df.columns.tolist())
+
+le = LabelEncoder()
+
+# Encoding features and target
+df['education'] = le.fit_transform(df['education'].str.strip())
+df['self_employed'] = le.fit_transform(df['self_employed'].str.strip())
+df['loan_status'] = le.fit_transform(df['loan_status'].str.strip())
+
+print("Data after encoding:")
+print(df[['education', 'self_employed', 'loan_status']].head())
+
+X = df.drop('loan_status', axis=1)
+y = df['loan_status']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print(f"Training set size: {X_train.shape}")
+print(f"Testing set size: {X_test.shape}")
+
+scaler = StandardScaler()
+
+# Fit only on the training data to avoid data leakage
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+knn_model = KNeighborsClassifier(n_neighbors=5)
+knn_model.fit(X_train_scaled, y_train)
+
+print("KNN Model training complete.")
+
+y_pred = knn_model.predict(X_test_scaled)
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Model Accuracy: {accuracy * 100:.2f}%")
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nDetailed Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# Save to disk
+pickle.dump(knn_model, open("loan_knn_model.pkl", "wb"))
+pickle.dump(scaler, open("scaler.pkl", "wb"))
+
+print("Files 'loan_knn_model.pkl' and 'scaler.pkl' are ready for download.")
+
+def predict_new_applicant(data_list):
+    """
+    Input order: [no_of_dependents, education, self_employed, income_annum,
+                  loan_amount, loan_term, cibil_score, residential_assets,
+                  commercial_assets, luxury_assets, bank_assets]
+    """
+    # Scale input
+    data_scaled = scaler.transform([data_list])
+    # Predict
+    result = knn_model.predict(data_scaled)
+    return "Approved" if result[0] == 0 else "Rejected"
+
+# Test Example (using values from a typical approved profile)
+test_data = [2, 0, 0, 9600000, 29900000, 12, 778, 2400000, 17600000, 22700000, 8000000]
+print(f"The predicted status for the test data is: {predict_new_applicant(test_data)}")
